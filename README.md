@@ -32,3 +32,20 @@ $$
 > - Identifying the true content of a file (Mime-Type) even if its extension has changed (For a limited number of files contained in the code)
 > **Note:** You can also access PDF export from the link below.
 > **PDF:** [PDF-Sample](https://github.com/mmn1998/PDF-Sample)
+
+
+A lightweight .NET utility library for handling common file operations
+with a clean and reusable API.
+
+## Tech Stack
+- .NET
+- C#
+
+## Features
+- File read/write helpers
+- Path and directory utilities
+- Safe and reusable abstractions
+
+## Purpose
+This project was created as a reusable helper library
+to simplify file-related operations in .NET applications.
