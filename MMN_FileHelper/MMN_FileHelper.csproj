@@ -10,6 +10,7 @@
 		<PackageReference Include="ClosedXML" Version="0.104.2" />
 		<PackageReference Include="CsvHelper" Version="33.0.1" />
 		<PackageReference Include="Microsoft.AspNetCore.Http" Version="2.2.2" />
+		<PackageReference Include="QuestPDF" Version="2022.12.5" />
 	</ItemGroup>
 
 </Project>

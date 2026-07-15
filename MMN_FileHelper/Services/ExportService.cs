@@ -1,6 +1,8 @@
 ﻿using ClosedXML.Excel;
 using CsvHelper;
 using CsvHelper.Configuration;
+using MMN_FileHelper.Models;
+using QuestPDF.Fluent;
 using System.Globalization;
 
 namespace MMN_FileHelper.Services;
@@ -73,5 +75,68 @@ public class ExportService : IExportService
         using var memoryStream = new MemoryStream();
         workbook.SaveAs(memoryStream);
         return memoryStream.ToArray();
+    }
+    public byte[] ExportToPdf<T>(IEnumerable<T> data, PdfConfigurations pdfConfigurations)
+    {
+        var pdfDoc = Document.Create(document =>
+        {
+            document.Page(page =>
+            {
+                //page.ContentFromRightToLeft();
+                page.Margin(pdfConfigurations.PageMargin);
+                page.Header()
+                    .Text(pdfConfigurations.HeaderText)
+                    .FontFamily(pdfConfigurations.FontFamily).Fallback()
+                    .SemiBold();
+
+                page.Content().AlignCenter()
+                    .Table(table =>
+                    {
+                        table.ColumnsDefinition(cd =>
+                        {
+                            for (int i = 0; i < pdfConfigurations.ColumnsCount; i++)
+                            {
+                                cd.RelativeColumn(pdfConfigurations.ColumnWidths);
+                            }
+                        });
+
+                        table.Header(tableHeader =>
+                        {
+                            foreach (var colunName in pdfConfigurations.ColumnNames)
+                            {
+                                tableHeader.Cell()
+                                    .Border(pdfConfigurations.TableBorders)
+                                    .AlignCenter()
+                                    .Text(colunName)
+                                    .FontFamily(pdfConfigurations.FontFamily)
+                                    .Fallback();
+                            }
+                        });
+                        var properties = typeof(T).GetProperties();
+                        foreach (var item in data)
+                        {
+                            foreach (var columnName in pdfConfigurations.ColumnNames)
+                            {
+                                var prop = properties.First(p => p.Name.Equals(columnName, StringComparison.OrdinalIgnoreCase));
+                                var value = prop.GetValue(item)?.ToString() ?? string.Empty;
+
+                                table.Cell()
+                                    .Border(pdfConfigurations.TableBorders)
+                                    .AlignCenter()
+                                    .Text(value)
+                                    .FontFamily(pdfConfigurations.FontFamily)
+                                    .Fallback();
+                            }
+                        }
+                    });
+                page.PageColor(pdfConfigurations.PageBackgroundColor);
+                page.Footer()
+                    .Text(text =>
+                    {
+                        text.CurrentPageNumber();
+                    });
+            });
+        });
+        return pdfDoc.GeneratePdf();
     }
 }
